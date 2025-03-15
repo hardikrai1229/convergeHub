@@ -1,6 +1,8 @@
 // src/components/Navbar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { UserButton } from '@clerk/clerk-react';
+
 
 function Navbar() {
     return (
@@ -10,6 +12,8 @@ function Navbar() {
                 <li><Link to="/" style={styles.link}>Home</Link></li>
                 <li><Link to="/login" style={styles.link}>Login</Link></li>
                 <li><Link to="/signup" style={styles.link}>Signup</Link></li>
+                <li>&nbsp;&nbsp;&nbsp;</li>
+                <UserButton afterSignOutUrl="/" />
             </ul>
         </nav>
     );
