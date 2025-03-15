@@ -1,8 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
 const http = require("http");
 const WebSocket = require("ws");
@@ -20,8 +18,6 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
 app.get("/", (req, res) => res.send("Server is running"));
 
 // ✅ Create HTTP + WebSocket Server
