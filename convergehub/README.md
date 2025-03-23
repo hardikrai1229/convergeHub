@@ -6,7 +6,7 @@ A real-time collaboration platform for team communication.
 - Real-time messaging
 - Channels and workspaces
 - File sharing
-- Voice and video calls
+- Kanban Board
 
 ## Setup
 1. Clone the repository.
