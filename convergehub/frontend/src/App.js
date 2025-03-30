@@ -14,8 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CollaborativeEditor from "./components/CollaborativeEditor";
 import FileSharing from "./components/FileSharing";
 import TaskManagement from "./components/TaskManagement";
-import { useUser } from '@clerk/clerk-react';
-
+import { useUser } from "@clerk/clerk-react";
 
 function App() {
   return (
@@ -94,9 +93,12 @@ function AppRoutes() {
       {/* ✅ Welcome Page */}
       <Route
         path="/"
-        element={<div style={styles.welcome}>Welcome to ConvergeHub! 
-        {user && <p>Hello, {user.firstName}!</p>}
-        </div>}
+        element={
+          <div style={styles.welcome}>
+            Welcome to ConvergeHub!
+            {user && <p>Hello, {user.firstName}!</p>}
+          </div>
+        }
       />
     </Routes>
   );
