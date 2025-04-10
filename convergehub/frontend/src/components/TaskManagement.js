@@ -1,55 +1,179 @@
-import React from "react";
-import KanbanBoard from "./kanban/KanbanBundle";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+import KanbanBoard from "./kanban/KanbanBoard";
+import axios from "axios";
 
-import "./kanban/KanbanStyles.css";
+const TaskManagement = () => {
+  const [connectionState, setConnectionState] = useState({
+    isLoading: true,
+    error: null,
+    retryCount: 0,
+  });
 
-function TaskManagement() {
+  // Connection test with timeout and retries
+  const testConnection = async () => {
+    try {
+      // Try basic endpoint first
+      await axios.get("http://localhost:5000/", {
+        timeout: 5000, // 5 second timeout
+      });
+
+      // Then test API endpoint
+      const apiTest = await axios.get("http://localhost:5000/api/tasks", {
+        timeout: 3000,
+        validateStatus: (status) => status < 500, // Don't reject for 404
+      });
+
+      return true;
+    } catch (err) {
+      console.error("Connection test failed:", err);
+      throw err;
+    }
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        setConnectionState((prev) => ({
+          ...prev,
+          isLoading: true,
+          error: null,
+        }));
+
+        await testConnection();
+
+        setConnectionState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: null,
+        }));
+      } catch (err) {
+        let errorMessage = "Could not connect to the server";
+
+        if (err.code === "ECONNABORTED") {
+          errorMessage = "Server is not responding. Please try again later.";
+        } else if (err.response) {
+          if (err.response.status === 404) {
+            errorMessage =
+              "API endpoint not found. Please check server configuration.";
+          } else {
+            errorMessage = `Server error: ${err.response.status}`;
+          }
+        } else if (err.request) {
+          errorMessage =
+            "No response from server. Check your network connection.";
+        }
+
+        setConnectionState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: new Error(errorMessage),
+        }));
+      }
+    };
+
+    initialize();
+  }, [connectionState.retryCount]);
+
+  const handleRetry = () => {
+    setConnectionState((prev) => ({
+      ...prev,
+      retryCount: prev.retryCount + 1,
+    }));
+  };
+
+  if (connectionState.error) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          p: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: "bold", mb: 2 }}
+        >
+          Failed to Initialize Task Board
+        </Typography>
+
+        <Alert severity="error" sx={{ mb: 3, maxWidth: "500px" }}>
+          {connectionState.error.message}
+          <Box sx={{ mt: 1, fontSize: "0.875rem" }}>
+            Please check:
+            <ul
+              style={{
+                textAlign: "left",
+                paddingLeft: "20px",
+                margin: "8px 0",
+              }}
+            >
+              <li>Your internet connection</li>
+              <li>Backend server status</li>
+              <li>API endpoint availability</li>
+            </ul>
+          </Box>
+        </Alert>
+
+        <Button
+          variant="contained"
+          onClick={handleRetry}
+          size="large"
+          sx={{ mt: 2 }}
+          startIcon={
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z"
+                fill="currentColor"
+              />
+            </svg>
+          }
+        >
+          Retry Connection
+        </Button>
+      </Box>
+    );
+  }
+
+  if (connectionState.isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress size={60} thickness={4} />
+        <Typography variant="body1" sx={{ mt: 3 }}>
+          Connecting to Task Service...
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          This may take a few moments
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}
-    >
-      <div
-        style={{
-          marginBottom: "24px",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "24px",
-            fontWeight: "600",
-            marginBottom: "8px",
-            color: "#1e293b",
-          }}
-        >
-          ✅ Task Management
-        </h2>
-        <p
-          style={{
-            fontSize: "16px",
-            color: "#64748b",
-            maxWidth: "800px",
-          }}
-        >
-          Manage your project tasks using our Kanban board. Drag and drop tasks
-          between columns to update their status.
-        </p>
-      </div>
-
-      <div
-        style={{
-          height: "calc(100vh - 200px)",
-          minHeight: "500px",
-          marginTop: "20px",
-        }}
-      >
-        <KanbanBoard />
-      </div>
-    </div>
+    <KanbanBoard
+      onError={(err) => setConnectionState((prev) => ({ ...prev, error: err }))}
+    />
   );
-}
+};
 
 export default TaskManagement;
