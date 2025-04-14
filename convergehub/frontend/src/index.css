@@ -9,4 +9,8 @@
 /* Tailwind's utility classes */
 @tailwind utilities;
 
-
+/* Enable smooth scrolling on the entire page */
+html {
+    @apply scroll-smooth;
+  }
+  

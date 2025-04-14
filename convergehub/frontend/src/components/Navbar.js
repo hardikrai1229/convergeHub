@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import ProfileManagement from './ProfileManagement';
-import '../index.css';
+import '../index.css'; // Ensure smooth scrolling is applied globally
 
 const routes = [
   { name: "Home", href: "/", isActive: true },
-  { name: "Features", href: "#", isActive: false },
+  { name: "Features", href: "#features", isActive: false }, // Updated href to "#features"
 ];
 
 const NavMenu = ({ routes }) => (
@@ -87,19 +87,13 @@ function Navbar({ user, onToggleSidebar, isSidebarOpen }) {
                 onClick={onToggleSidebar}
               >
                 <span
-                  className={`h-0.5 w-full bg-black rounded transition-transform duration-300 ${
-                    isSidebarOpen ? "rotate-45 translate-y-2" : ""
-                  }`}
+                  className={`h-0.5 w-full bg-black rounded transition-transform duration-300 ${isSidebarOpen ? "rotate-45 translate-y-2" : ""}`}
                 ></span>
                 <span
-                  className={`h-0.5 w-full bg-black rounded transition-opacity duration-300 ${
-                    isSidebarOpen ? "opacity-0" : "opacity-100"
-                  }`}
+                  className={`h-0.5 w-full bg-black rounded transition-opacity duration-300 ${isSidebarOpen ? "opacity-0" : "opacity-100"}`}
                 ></span>
                 <span
-                  className={`h-0.5 w-full bg-black rounded transition-transform duration-300 ${
-                    isSidebarOpen ? "-rotate-45 -translate-y-2" : ""
-                  }`}
+                  className={`h-0.5 w-full bg-black rounded transition-transform duration-300 ${isSidebarOpen ? "-rotate-45 -translate-y-2" : ""}`}
                 ></span>
               </button>
 

@@ -36,7 +36,9 @@ const HeroHeader29 = () => {
       </section>
 
       {/* 👇 Add this below the hero section */}
-      <FeatureCards />
+      <div id="features" className="py-20 bg-white">
+        <FeatureCards />
+      </div>
     </>
   );
 };
