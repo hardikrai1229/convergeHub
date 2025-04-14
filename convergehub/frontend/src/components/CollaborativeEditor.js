@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./CollaborativeEditor.css";
 
 function CollaborativeEditor() {
   const [document, setDocument] = useState("");
@@ -80,14 +79,15 @@ function CollaborativeEditor() {
   };
 
   return (
-    <div className="App">
-      <h1>Collaborative Editor</h1>
+    <div className="flex flex-col items-center p-6 w-full">
+      <h1 className="text-2xl font-semibold mb-4 text-white">Collaborative Editor</h1>
       <textarea
         ref={textareaRef}
         value={document}
         onChange={handleChange}
         rows="20"
         cols="80"
+        className="w-4/5 h-[400px] text-base p-3 border border-gray-300 rounded-md bg-gray-100 outline-none focus:ring-2 focus:ring-blue-400 resize-none"
       />
     </div>
   );

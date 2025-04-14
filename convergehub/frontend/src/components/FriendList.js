@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
 import { collection, query, where, getDocs, updateDoc, arrayUnion, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import "./FriendList.css"; // Add your CSS file for styling
 import ChatWindow from "./ChatWindow"; // Import the ChatWindow component
 
 const FriendList = () => {
@@ -15,20 +14,18 @@ const FriendList = () => {
   const [friendUsernames, setFriendUsernames] = useState({}); // Object to store friendId -> username mapping
   const [selectedFriend, setSelectedFriend] = useState(null);
 
-  // Fetch the current user from Firebase Authentication
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUser(user); // Set the current user
+        setCurrentUser(user);
       } else {
-        setCurrentUser(null); // No user is signed in
+        setCurrentUser(null);
       }
     });
 
-    return () => unsubscribe(); // Cleanup subscription
+    return () => unsubscribe();
   }, []);
 
-  // Fetch the user's friends list
   useEffect(() => {
     const fetchFriends = async () => {
       if (!currentUser) return;
@@ -42,10 +39,9 @@ const FriendList = () => {
     fetchFriends();
   }, [currentUser]);
 
-  // Real-time search for users by username
   useEffect(() => {
     if (!searchTerm.trim()) {
-      setSearchResults([]); // Clear search results if search term is empty
+      setSearchResults([]);
       return;
     }
 
@@ -63,14 +59,12 @@ const FriendList = () => {
     fetchSearchResults();
   }, [searchTerm]);
 
-  // Add a friend
   const handleAddFriend = async (friendId, friendUsername) => {
     if (!currentUser) {
       console.error("No current user found.");
       return;
     }
 
-    // Check if the friend is already added
     if (friends.includes(friendId)) {
       setError(`${friendUsername} is already your friend.`);
       return;
@@ -80,25 +74,22 @@ const FriendList = () => {
     const friendRef = doc(db, "users", friendId);
 
     try {
-      // Add friend to the current user's friends array
       await updateDoc(userRef, {
         friends: arrayUnion(friendId),
       });
 
-      // Add current user to the friend's friends array
       await updateDoc(friendRef, {
         friends: arrayUnion(currentUser.uid),
       });
 
-      setFriends((prev) => [...prev, friendId]); // Update local state
-      setError(""); // Clear any previous error
+      setFriends((prev) => [...prev, friendId]);
+      setError("");
     } catch (error) {
       console.error("Error adding friend:", error);
       setError("Failed to add friend. Please try again.");
     }
   };
 
-  // Fetch usernames for all friends once the friends list is available
   useEffect(() => {
     const fetchFriendUsernames = async () => {
       if (!friends.length) return;
@@ -107,7 +98,7 @@ const FriendList = () => {
       for (const friendId of friends) {
         const friendData = await getDocs(query(collection(db, "users"), where("uid", "==", friendId)));
         const user = friendData.docs[0]?.data();
-        friendUsernamesMap[friendId] = user?.username || friendId; // Fallback to friendId if username not found
+        friendUsernamesMap[friendId] = user?.username || friendId;
       }
       setFriendUsernames(friendUsernamesMap);
     };
@@ -116,60 +107,84 @@ const FriendList = () => {
   }, [friends]);
 
   return (
-    <div className="friend-list">
-      <div className="friend-list-header">
-        <h3>Friends</h3>
-        <button onClick={() => setShowSearch(!showSearch)}>+ Add Friend</button>
-      </div>
+    <div className="flex h-full w-full">
+      {/* Sidebar - Friend List */}
+      <div className="w-64 bg-gray-800 p-4 flex flex-col overflow-y-auto sticky top-0 h-screen">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl text-white font-semibold">Friends</h3>
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            + Add Friend
+          </button>
+        </div>
 
-      {showSearch && (
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search by username"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {showSearch && (
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search by username"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 mb-2 bg-gray-700 rounded-md text-white"
+            />
 
-          {searchResults.length > 0 && (
-            <div className="search-results">
-              {searchResults.map((user) => (
-                <div key={user.uid} className="search-result-item">
-                  <span>{user.username}</span>
-                  <button onClick={() => handleAddFriend(user.uid, user.username)}>Add</button>
+            {searchResults.length > 0 && (
+              <div className="bg-gray-700 p-4 rounded-md">
+                {searchResults.map((user) => (
+                  <div key={user.uid} className="flex justify-between items-center mb-2">
+                    <span>{user.username}</span>
+                    <button
+                      onClick={() => handleAddFriend(user.uid, user.username)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded-md"
+                    >
+                      Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        <div className="flex-1 overflow-y-auto">
+          {friends.length > 0 ? (
+            friends.map((friendId) => {
+              const friendUsername = friendUsernames[friendId] || friendId;
+
+              return (
+                <div
+                  key={friendId}
+                  className="p-3 bg-gray-700 text-white rounded-md mb-2 cursor-pointer hover:bg-blue-600"
+                  onClick={() => setSelectedFriend({ id: friendId, username: friendUsername })}
+                >
+                  <span>{friendUsername}</span>
                 </div>
-              ))}
-            </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-gray-400">Add friends to see them here.</p>
           )}
         </div>
-      )}
+      </div>
 
-      {/* Display error message */}
-      {error && <p className="error-message">{error}</p>}
-
-      <div className="friends">
-        {friends.length > 0 ? (
-          friends.map((friendId) => {
-            // Get the username for each friend from the friendUsernames object
-            const friendUsername = friendUsernames[friendId] || friendId;
-
-            return (
-              <div
-                key={friendId} className="friend-item"
-                onClick={() => setSelectedFriend({ id: friendId, username: friendUsername })}
-              >                
-              <span>{friendUsername}</span>
-              </div>
-            );
-          })
+      {/* Main Content - Chat Window */}
+      <div className="flex-1 p-4 bg-gray-700 overflow-y-auto">
+        {selectedFriend && selectedFriend.id ? (
+          <ChatWindow
+            friendId={selectedFriend.id}
+            friendUsername={selectedFriend.username}
+            onClose={() => setSelectedFriend(null)}
+          />
         ) : (
-          <p>Add friends to see them here.</p>
+          <div className="h-full flex items-center justify-center text-lg text-gray-400">
+            Select a friend to start chatting
+          </div>
         )}
       </div>
-      {/* Render ChatWindow if a friend is selected */}
-      {selectedFriend && (
-        <ChatWindow friendId={selectedFriend.id} friendUsername={selectedFriend.username} />
-      )}
     </div>
   );
 };
