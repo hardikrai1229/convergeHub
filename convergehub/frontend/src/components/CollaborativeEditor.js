@@ -6,7 +6,7 @@ function CollaborativeEditor() {
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    const newSocket = new WebSocket("ws://localhost:5000");
+    const newSocket = new WebSocket(process.env.REACT_APP_WS_URL);
     setSocket(newSocket);
 
     newSocket.onopen = () => {

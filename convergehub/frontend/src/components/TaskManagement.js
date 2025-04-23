@@ -9,6 +9,9 @@ import {
 import KanbanBoard from "./kanban/KanbanBoard";
 import axios from "axios";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+
 const TaskManagement = () => {
   const [connectionState, setConnectionState] = useState({
     isLoading: true,
@@ -20,16 +23,14 @@ const TaskManagement = () => {
   const testConnection = async () => {
     try {
       // Try basic endpoint first
-      await axios.get("http://localhost:5000/", {
+      await axios.get(`${API_BASE_URL}/`, {
         timeout: 5000, // 5 second timeout
       });
 
       // Then test API endpoint
-      const apiTest = await axios.get("http://localhost:5000/api/tasks", {
-        timeout: 3000,
-        validateStatus: (status) => status < 500, // Don't reject for 404
+      await axios.get(`${API_BASE_URL}/api/tasks`, {
+        timeout: 5000, // 5 second timeout
       });
-
       return true;
     } catch (err) {
       console.error("Connection test failed:", err);

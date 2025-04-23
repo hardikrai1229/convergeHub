@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { TrashIcon } from "@heroicons/react/24/outline";
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === "development" ? "http://localhost:5000" : "",
+  baseURL: process.env.NODE_ENV === "development" ? API_BASE_URL : "",
   timeout: 10000,
 });
 
