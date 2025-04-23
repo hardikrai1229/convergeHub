@@ -98,9 +98,13 @@ function Navbar({ user, onToggleSidebar, isSidebarOpen }) {
               </button>
 
               {/* Logo */}
-              <a className="font-black text-3xl text-gray-800" href="#!">
+              <Link to="/">
+              <button className="font-black text-3xl text-gray-800">
                 ConvergeHub
-              </a>
+              </button>
+        
+              </Link>
+
             </div>
 
             <ul
