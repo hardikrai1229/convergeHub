@@ -11,12 +11,6 @@ const Task = require("./models/Task");
 const app = express();
 
 // Enhanced CORS configuration
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
 app.use(express.json());
 
 // Enhanced MongoDB connection
@@ -223,7 +217,7 @@ process.on("SIGINT", async () => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
