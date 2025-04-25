@@ -6,18 +6,18 @@ const http = require("http");
 const WebSocket = require("ws");
 const Document = require("./models/Document");
 const Task = require("./models/Task");
-
+const frontendURL = process.env.frontendURL;
 // Load environment variables
 const app = express();
 
 // Enhanced CORS configuration
+app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: `${frontendURL}`,
+    credentials: true,
   })
 );
-app.use(express.json());
 
 // Enhanced MongoDB connection
 mongoose
@@ -223,7 +223,7 @@ process.on("SIGINT", async () => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

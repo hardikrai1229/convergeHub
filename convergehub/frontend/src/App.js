@@ -11,21 +11,27 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CollaborativeEditor from "./components/CollaborativeEditor";
 import FileSharing from "./components/FileSharing";
 import TaskManagement from "./components/TaskManagement";
+import HeroHeader29 from "./components/HeroHeader29";
+import './index.css';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 🆕
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
-      setLoading(false); // Set loading to false once auth state is checked
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Show a loading spinner while checking auth state
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -33,21 +39,26 @@ function App() {
   return (
     <Router>
       <div style={styles.app}>
-        <Navbar user={user} />
+        <Navbar user={user} onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
         <div style={styles.content}>
-          <ChannelList />
-          <AppRoutes user={user} />
+          {/* Sidebar */}
+          <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-64" : "w-0"} overflow-hidden`}>
+            <ChannelList />
+          </div>
+
+          {/* Main Content */}
+          <main style={styles.mainContent}>
+            <AppRoutes user={user} />
+          </main>
         </div>
       </div>
     </Router>
   );
 }
 
-// ✅ AppRoutes Component (All Routes here)
 function AppRoutes({ user }) {
   return (
     <Routes>
-      {/* ✅ Chat Page */}
       <Route
         path="/chat"
         element={
@@ -56,8 +67,6 @@ function AppRoutes({ user }) {
           </ProtectedRoute>
         }
       />
-
-      {/* ✅ Collaborative Editor */}
       <Route
         path="/editor"
         element={
@@ -66,8 +75,6 @@ function AppRoutes({ user }) {
           </ProtectedRoute>
         }
       />
-
-      {/* ✅ File Sharing */}
       <Route
         path="/file-sharing"
         element={
@@ -76,8 +83,6 @@ function AppRoutes({ user }) {
           </ProtectedRoute>
         }
       />
-
-      {/* ✅ Task Management */}
       <Route
         path="/tasks"
         element={
@@ -86,8 +91,6 @@ function AppRoutes({ user }) {
           </ProtectedRoute>
         }
       />
-
-      {/* ✅ Support Page */}
       <Route
         path="/support"
         element={
@@ -96,28 +99,9 @@ function AppRoutes({ user }) {
           </ProtectedRoute>
         }
       />
-
-      {/* ✅ Login/Signup */}
-      <Route
-        path="/login"
-        element={user ? <Navigate to="/" /> : <Login />} // Redirect to home if logged in
-      />
-      <Route
-        path="/signup"
-        element={user ? <Navigate to="/" /> : <Signup />} // Redirect to home if logged in
-      />
-
-      {/* ✅ Welcome Page */}
-      <Route
-        path="/"
-        element={
-          <div style={styles.welcome}>
-            Welcome to ConvergeHub!
-            {user && <p>Hello, {user.displayName || user.email}!</p>}
-          </div>
-        }
-      />
-
+      <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/" /> : <Signup />} />
+      <Route path="/" element={<HeroHeader29 />} />
       <Route path="*" element={<h1>404 Not Found</h1>} />
     </Routes>
   );
@@ -128,17 +112,22 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     height: "100vh",
+    width: "100vw",
+    overflow: "hidden",
   },
   content: {
     display: "flex",
     flex: 1,
+    overflow: "hidden",
   },
-  welcome: {
+  mainContent: {
     flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: "24px",
+    height: "100%",
+    width: "100%",
+    padding: 0,
+    margin: 0,
+    overflowY: "auto",
+    backgroundColor: "#1f2937", // Optional: Tailwind's gray-800
   },
 };
 

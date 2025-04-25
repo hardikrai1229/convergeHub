@@ -1,5 +1,16 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
+/* src/index.css */
+
+/* Tailwind's base styles */
+@tailwind base;
+
+/* Tailwind's component styles */
+@tailwind components;
+
+/* Tailwind's utility classes */
+@tailwind utilities;
+
+/* Enable smooth scrolling on the entire page */
+html {
+    @apply scroll-smooth;
+  }
+  
