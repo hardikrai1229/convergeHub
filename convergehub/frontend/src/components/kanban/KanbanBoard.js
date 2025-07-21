@@ -4,7 +4,7 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === "development" ? API_BASE_URL : "",
+  baseURL: process.env.NODE_ENV === "development" ? API_BASE_URL : API_BASE_URL,
   timeout: 10000,
 });
 
@@ -70,11 +70,30 @@ const KanbanBoard = () => {
     }
   };
 
+  // const columns = {
+  //   todo: { name: "To Do", items: tasks.filter((t) => t.status === "todo") },
+  //   inProgress: { name: "In Progress", items: tasks.filter((t) => t.status === "inProgress") },
+  //   completed: { name: "Completed", items: tasks.filter((t) => t.status === "completed") },
+  // };
+
+  // test fpr deploying
+
+
   const columns = {
-    todo: { name: "To Do", items: tasks.filter((t) => t.status === "todo") },
-    inProgress: { name: "In Progress", items: tasks.filter((t) => t.status === "inProgress") },
-    completed: { name: "Completed", items: tasks.filter((t) => t.status === "completed") },
-  };
+  todo: {
+    name: "To Do",
+    items: Array.isArray(tasks) ? tasks.filter((t) => t.status === "todo") : [],
+  },
+  inProgress: {
+    name: "In Progress",
+    items: Array.isArray(tasks) ? tasks.filter((t) => t.status === "inProgress") : [],
+  },
+  completed: {
+    name: "Completed",
+    items: Array.isArray(tasks) ? tasks.filter((t) => t.status === "completed") : [],
+  },
+};
+
 
   return (
     <div className="p-6">
